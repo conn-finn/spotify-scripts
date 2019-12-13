@@ -14,3 +14,4 @@ Automatically updates a public playlist weekly with 15 random songs from 15 diff
  
 ## Status
 * [x] create git repository/README
+* [x] remove old weekly songs from playlist
