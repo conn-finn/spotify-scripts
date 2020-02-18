@@ -19,3 +19,4 @@ Automatically updates a public playlist weekly with 15 random songs from 15 diff
 * [x] add new songs to weekly playlist
 * [x] add checks
 * [x] show when playlist was updated
+* [x] choose a few songs from pool playlist that have been there the longest

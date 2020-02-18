@@ -12,9 +12,11 @@ scope = 'playlist-modify-public playlist-modify-private'
 spotipy_client_id = client_id
 spotipy_client_secret = client_secret
 spotipy_redirect_url = redirect_url
+#constants:
 PLAYLIST_SIZE = 15
 MIN_SOURCE_PLAYLIST_SIZE = 20
 RANDOM_THRESHOLD = 30
+OLDEST_SONG_THRESHOLD = 4
  
 token = util.prompt_for_user_token(username, scope, client_id = spotipy_client_id, client_secret = spotipy_client_secret, redirect_uri = spotipy_redirect_url)
 
@@ -45,15 +47,20 @@ def main():
         response = spotify.user_playlist(username, source_playlist_id, fields = 'tracks ,next')
         newTracks = []
         newArtists = []
-        # if source is big enough, pick songs randomly
+        # if source is big enough, pick songs randomly after the first few "oldest" songs
         if source_length > RANDOM_THRESHOLD:
-            while len(newArtists) < PLAYLIST_SIZE:
-                ran = random.randrange(len(response['tracks']['items'])-1)
+            count = 0
+            while len(newTracks) < PLAYLIST_SIZE:
+                ran = count
+                if count >= OLDEST_SONG_THRESHOLD:
+                    ran = random.randrange(len(response['tracks']['items'])-1)
+
                 item = response['tracks']['items'][ran]
                 track = {
                     "positions": [ran],
                     "uri": item['track']['id']
                 }
+                count += 1
                 # retrieve main artist id
                 artist = item['track']['artists'][0]['id']
                 if artist not in newArtists:
@@ -70,7 +77,7 @@ def main():
                 if artist not in newArtists:
                     newArtists.append(artist)
                     newTracks.append(track)
-                if len(newArtists) > 14:
+                if len(newTracks) >= PLAYLIST_SIZE:
                     break
 
         # remove these songs from source playlist
