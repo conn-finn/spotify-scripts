@@ -1,7 +1,7 @@
 import random
 from datetime import datetime
 
-from personalSpotifyInfo import *
+from personalSpotifyInfo import album_art_playlist_id, client_id, client_secret, redirect_url, user
 
 import spotipy
 import spotipy.util as util
