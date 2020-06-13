@@ -10,7 +10,7 @@ import spotipy.util as util
 playlist_id = album_art_playlist_id
 
 filename = "judgingTracksByTheirAlbumCover.html"
-stylesheet = "stylesheet.css"
+stylesheet = "albumCoverStylesheet.css"
 
 
 class albumInfo:
