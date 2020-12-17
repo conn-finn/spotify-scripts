@@ -53,6 +53,7 @@ def handleResponse(response):
 
     albums = []
     for trackObj in tracks:
+        if trackObj['is_local']: continue # ignore local files
         track = trackObj['track']
         cover = track['album']['images'][0]['url']
         artist = track['album']['artists'][0]['name']
