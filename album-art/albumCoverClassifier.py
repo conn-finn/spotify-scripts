@@ -11,6 +11,7 @@ from albumCovers import getInfo
 
 # use gpu if available
 dev = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+if not torch.cuda.is_available(): quit() # basically need to utilize gpu for my machine
 
 class Network(nn.Module):
     def __init__(self, image_dims=640, max_pool_size=2, stride=2, filter_size=5, layer1_out_channels=8, layer2_out_channels=12, layer1_padding=0, layer2_padding=2):
