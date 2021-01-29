@@ -28,9 +28,7 @@ class Network(nn.Module):
 
         # define layers:
         self.layer1 = nn.Conv2d(in_channels=3, out_channels=self.layer1_out_channels, kernel_size=self.filter_size, padding=self.layer1_padding)
-
         self.layer2 = nn.Conv2d(in_channels=self.layer1_out_channels, out_channels=self.layer2_out_channels, kernel_size=self.filter_size, padding=self.layer2_padding)
-
         self.layer3 = nn.Linear(in_features=self.layer2_out_channels*self.dims*self.dims, out_features=256)
 
     def __getDims(self): # assumes square image
@@ -52,13 +50,14 @@ class Network(nn.Module):
 
 
 class NetworkEvaluator:
-    def __init__(self, network, trainloader, testloader, lr=0.001, shuffle=True, epochs=5):
+    def __init__(self, network, train_loader, test_loader, lr=0.001, shuffle=True, epochs=5, accuracy_threshold=0.04):
         self.network = network
-        self.trainloader = trainloader
-        self.testloader = testloader
+        self.train_loader = train_loader
+        self.test_loader = test_loader
         self.lr=lr
         self.shuffle=shuffle
         self.epochs=epochs
+        self.accuracy_threshold = accuracy_threshold
 
     def get_accuracy(self, dataloader):
         count=0
@@ -79,8 +78,9 @@ class NetworkEvaluator:
     def evaluate(self):
         optimizer = optim.Adam(self.network.parameters(), lr=self.lr)
         self.network.train()
+        prevAcc = 0
         for epoch in range(self.epochs):
-            for images, labels in self.trainloader:
+            for images, labels in self.train_loader:
                 images, labels = images.to(dev), labels.to(dev)
                 preds = self.network(images)
                 loss = F.cross_entropy(preds, labels).to(dev)
@@ -88,14 +88,17 @@ class NetworkEvaluator:
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
-            print('Epoch {0}: train set accuracy {1}'.format(epoch,self.get_accuracy(self.trainloader)))
-        testAcc = self.get_accuracy(self.testloader)
-        print('Epoch {0}: test set accuracy {1}'.format(epoch,testAcc))
+            epochAcc = self.get_accuracy(self.train_loader)
+            print('Epoch {0}: train set accuracy {1}'.format(epoch, epochAcc))
+            if epochAcc - prevAcc < self.accuracy_threshold: break
+            else: prevAcc = epochAcc
+        testAcc = self.get_accuracy(self.test_loader)
+        print('\nTest set accuracy {1}'.format(epoch,testAcc))
         return testAcc
 
 
 network = Network()
 network.to(dev)
-trainloader, testloader = getInfo()
-ne = NetworkEvaluator(network, trainloader, testloader)
+train_loader, test_loader = getInfo()
+ne = NetworkEvaluator(network, train_loader, test_loader)
 ne.evaluate()

@@ -75,10 +75,11 @@ def load_split_train_test(album_covers_folder, valid_size=0.2, batch_size=16):
     return trainloader, testloader
 
 
-def getInfo():
-    spotify = retrieveAlbumInfo.SpotifyInfo(user, 'playlist-modify-public playlist-modify-private', client_id, client_secret, redirect_url)
-    spotify.validate()
-    if not spotify.valid: quit()
+def getInfo(newPlaylistsFlag=False):
+    if newPlaylistsFlag:
+        spotify = retrieveAlbumInfo.SpotifyInfo(user, 'playlist-modify-public playlist-modify-private', client_id, client_secret, redirect_url)
+        spotify.validate()
+        if not spotify.valid: quit()
 
     trainloader, testloader = load_split_train_test(album_cover_data_path)
     return trainloader, testloader
