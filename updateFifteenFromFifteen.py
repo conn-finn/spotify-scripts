@@ -1,4 +1,5 @@
 import random
+import os
 from datetime import datetime
 from personalSpotifyInfo import *
 
@@ -12,17 +13,28 @@ scope = 'playlist-modify-public playlist-modify-private'
 spotipy_client_id = client_id
 spotipy_client_secret = client_secret
 spotipy_redirect_url = redirect_url
+
 #constants:
 PLAYLIST_SIZE = 15
 MIN_SOURCE_PLAYLIST_SIZE = 20
 RANDOM_THRESHOLD = 30
 OLDEST_SONG_THRESHOLD = 4
- 
-token = util.prompt_for_user_token(username, scope, client_id = spotipy_client_id, client_secret = spotipy_client_secret, redirect_uri = spotipy_redirect_url)
+
+# token = util.prompt_for_user_token(username, scope, client_id = spotipy_client_id, client_secret = spotipy_client_secret, redirect_uri = spotipy_redirect_url)
+
+def get_token():
+    return util.prompt_for_user_token(username, scope, client_id = spotipy_client_id, client_secret = spotipy_client_secret, redirect_uri = spotipy_redirect_url)
+
+try:
+    token = get_token()
+except:
+    os.remove(f".cache-{username}")
+    token = get_token()
 
 def main():
     if token:
-        spotify = spotipy.Spotify(auth = token)
+        spotify = spotipy.Spotify(token)
+        # spotify = spotipy.Spotify(auth = token)
         spotify.trace = False
 
         # check if there are enough songs in our source playlist
